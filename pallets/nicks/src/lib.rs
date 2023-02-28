@@ -99,7 +99,7 @@ pub mod pallet {
 		NameKilled { target: T::AccountId, deposit: BalanceOf<T> },
 	}
 
-    #[derive(Encode, Decode, Default, TypeInfo, MaxEncodedLen, PartialEqNoBound, RuntimeDebug)]
+    #[derive(CloneNoBound, Encode, Decode, Default, TypeInfo, MaxEncodedLen, PartialEqNoBound, RuntimeDebug)]
 	#[scale_info(skip_type_params(T))]
 	#[codec(mel_bound())]
 	pub struct Nickname<T: Config> {
@@ -108,7 +108,7 @@ pub mod pallet {
 		pub third: AccountStatus
 	}
 
-    #[derive(Encode, Decode, TypeInfo, MaxEncodedLen, PartialEqNoBound, RuntimeDebug)]
+    #[derive(Clone, Encode, Decode, TypeInfo, MaxEncodedLen, PartialEqNoBound, RuntimeDebug)]
 	#[scale_info(skip_type_params(T))]
 	#[codec(mel_bound())]
 	pub enum AccountStatus {
