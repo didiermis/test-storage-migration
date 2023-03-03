@@ -124,19 +124,19 @@ pub mod pallet {
 		StorageMap<_, Twox64Concat, T::AccountId, (Nickname<T>, BalanceOf<T>)>;
 
 	/// The current storage version.
-	const STORAGE_VERSION: StorageVersion = StorageVersion::new(2);
+	const STORAGE_VERSION: StorageVersion = StorageVersion::new(1);
 
 	#[pallet::pallet]
 	#[pallet::generate_store(pub(super) trait Store)]
 	#[pallet::storage_version(STORAGE_VERSION)]
 	pub struct Pallet<T>(_);
 
-	#[pallet::hooks]
-	impl<T: Config> Hooks<BlockNumberFor<T>> for Pallet<T> {
-		fn on_runtime_upgrade() -> frame_support::weights::Weight {
-			migration::migrate_to_v2::<T>()
-		}
-	}
+	// #[pallet::hooks]
+	// impl<T: Config> Hooks<BlockNumberFor<T>> for Pallet<T> {
+	// 	fn on_runtime_upgrade() -> frame_support::weights::Weight {
+	// 		migration::migrate_to_v2::<T>()
+	// 	}
+	// }
 
 
 	#[pallet::call]
