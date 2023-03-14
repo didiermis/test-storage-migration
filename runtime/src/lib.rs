@@ -582,20 +582,44 @@ impl_runtime_apis! {
 
 	#[cfg(feature = "try-runtime")]
 	impl frame_try_runtime::TryRuntime<Block> for Runtime {
-	   fn on_runtime_upgrade() -> (frame_support::weights::Weight, frame_support::weights::Weight) {
+	   fn on_runtime_upgrade(checks: frame_try_runtime::UpgradeCheckSelect) -> (frame_support::weights::Weight, frame_support::weights::Weight) {
 		   log::info!("try-runtime::on_runtime_upgrade.");
 		   // NOTE: intentional unwrap: we don't want to propagate the error backwards, and want to
 		   // have a backtrace here. If any of the pre/post migration checks fail, we shall stop
 		   // right here and right now.
-		   let weight = Executive::try_runtime_upgrade().map_err(|err|{
-			   log::info!("try-runtime::on_runtime_upgrade failed with: {:?}", err);
-			   err
-		   }).unwrap();
-		   (weight, RuntimeBlockWeights::get().max_block)
+		//    let weight = Executive::try_runtime_upgrade().map_err(|err|{
+		// 	   log::info!("try-runtime::on_runtime_upgrade failed with: {:?}", err);
+		// 	   err
+		//    }).unwrap();
+		   let weight = Executive::try_runtime_upgrade(checks).unwrap();
+		// (weight, RuntimeBlockWeights::get().max_block)
+		   (weight, BlockWeights::get().max_block)
 	   }
-	   fn execute_block_no_check(block: Block) -> frame_support::weights::Weight {
-		   Executive::execute_block_no_check(block)
-	   }
+	// try 1: Not working
+	//    fn execute_block_no_check(block: Block) -> frame_support::weights::Weight {
+	// 	   Executive::try_execute_block(block)
+	//    }
+
+	// try 2: Working
+		fn execute_block(
+			block: Block,
+			state_root_check: bool,
+			signature_check: bool,
+			select: frame_try_runtime::TryStateSelect
+		) -> Weight {
+			// NOTE: intentional unwrap: we don't want to propagate the error backwards, and want to
+			// have a backtrace here.
+			Executive::try_execute_block(block, state_root_check, signature_check, select).expect("execute-block failed")
+		}
+
+	// try 3: Not worrking
+	// 	fn execute_block(
+	// 		block: Block,
+	// 	) -> Weight {
+	// 		NOTE: intentional unwrap: we don't want to propagate the error backwards, and want to
+	// 		have a backtrace here.
+	// 		Executive::execute_block(block).expect("execute-block failed")
+	// 	}
 	}
 }
 
