@@ -4334,6 +4334,7 @@ dependencies = [
 name = "pallet-nicks"
 version = "4.0.0-dev"
 dependencies = [
+ "frame-executive",
  "frame-support",
  "frame-system",
  "pallet-balances",
