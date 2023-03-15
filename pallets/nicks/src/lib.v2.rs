@@ -99,12 +99,27 @@ pub mod pallet {
 		NameKilled { target: T::AccountId, deposit: BalanceOf<T> },
 	}
 
-    #[derive(Encode, Decode, Default, TypeInfo, MaxEncodedLen, PartialEqNoBound, RuntimeDebug)]
+    #[derive(CloneNoBound, Encode, Decode, Default, TypeInfo, MaxEncodedLen, PartialEqNoBound, RuntimeDebug)]
 	#[scale_info(skip_type_params(T))]
 	#[codec(mel_bound())]
 	pub struct Nickname<T: Config> {
 		pub first: BoundedVec<u8, T::MaxLength>,
 		pub last: Option<BoundedVec<u8, T::MaxLength>>,
+		pub third: AccountStatus
+	}
+
+    #[derive(Clone, Encode, Decode, TypeInfo, MaxEncodedLen, PartialEqNoBound, RuntimeDebug)]
+	#[scale_info(skip_type_params(T))]
+	#[codec(mel_bound())]
+	pub enum AccountStatus {
+		Active,
+		Inactive,
+	}
+
+	impl Default for AccountStatus {
+		fn default() -> Self {
+			AccountStatus::Active
+		}
 	}
 
 	/// Error for the nicks pallet.
@@ -125,7 +140,7 @@ pub mod pallet {
 
 	/// The current storage version.
 	const STORAGE_VERSION: StorageVersion = StorageVersion::new(2);
-	
+
 	#[pallet::pallet]
 	#[pallet::generate_store(pub(super) trait Store)]
 	#[pallet::storage_version(STORAGE_VERSION)]
@@ -184,7 +199,7 @@ pub mod pallet {
 				deposit
 			};
 
-			<NameOf<T>>::insert(&sender, (Nickname{first: bounded_first, last: bounded_last}, deposit));
+			<NameOf<T>>::insert(&sender, (Nickname{first: bounded_first, last: bounded_last, third: AccountStatus::default()}, deposit));
 			Ok(())
 		}
 
@@ -197,6 +212,7 @@ pub mod pallet {
 		/// - One balance operation.
 		/// - One storage read/write.
 		/// - One event.
+		/// # </weight>
 		#[pallet::call_index(1)]
 		#[pallet::weight(70_000_000)]
 		pub fn clear_name(origin: OriginFor<T>) -> DispatchResult {
@@ -276,7 +292,7 @@ pub mod pallet {
 			let target = T::Lookup::lookup(target)?;
 			let deposit = <NameOf<T>>::get(&target).map(|x| x.1).unwrap_or_else(Zero::zero);
 
-			<NameOf<T>>::insert(&target, (Nickname{first: bounded_first, last: bounded_last}, deposit));
+			<NameOf<T>>::insert(&target, (Nickname{first: bounded_first, last: bounded_last, third: AccountStatus::default()}, deposit));
 
 			Self::deposit_event(Event::<T>::NameForced { target });
 			Ok(())
