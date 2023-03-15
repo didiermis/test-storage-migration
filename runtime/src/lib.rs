@@ -344,6 +344,14 @@ pub type UncheckedExtrinsic =
 	generic::UncheckedExtrinsic<Address, RuntimeCall, Signature, SignedExtra>;
 /// The payload being signed in transactions.
 pub type SignedPayload = generic::SignedPayload<RuntimeCall, SignedExtra>;
+
+/// All migrations that will run on the next runtime upgrade.
+///
+/// Should be cleared after every release.
+pub type Migrations = (
+	pallet_nicks::migration::v2::MigrateToV2<Runtime>,
+);
+
 /// Executive: handles dispatch to the various modules.
 pub type Executive = frame_executive::Executive<
 	Runtime,
@@ -351,7 +359,7 @@ pub type Executive = frame_executive::Executive<
 	frame_system::ChainContext<Runtime>,
 	Runtime,
 	AllPalletsWithSystem,
-	pallet_nicks::migration::v2::MigrateToV2<Runtime>,
+	Migrations,
 >;
 
 #[cfg(feature = "runtime-benchmarks")]
@@ -558,6 +566,7 @@ impl_runtime_apis! {
 		}
 	}
 
+	// Original code from tutorial
 	// #[cfg(feature = "try-runtime")]
 	// impl frame_try_runtime::TryRuntime<Block> for Runtime {
 	// 	fn on_runtime_upgrade(checks: frame_try_runtime::UpgradeCheckSelect) -> (Weight, Weight) {
@@ -581,9 +590,10 @@ impl_runtime_apis! {
 	// }
 
 
+	// First implementation of try-runtime
 	#[cfg(feature = "try-runtime")]
 	impl frame_try_runtime::TryRuntime<Block> for Runtime {
-	   fn on_runtime_upgrade(checks: frame_try_runtime::UpgradeCheckSelect) -> (frame_support::weights::Weight, frame_support::weights::Weight) {
+	   fn on_runtime_upgrade(checks: frame_try_runtime::UpgradeCheckSelect) -> (Weight, Weight) {
 		   log::info!("try-runtime::on_runtime_upgrade.");
 		   // NOTE: intentional unwrap: we don't want to propagate the error backwards, and want to
 		   // have a backtrace here. If any of the pre/post migration checks fail, we shall stop
@@ -596,10 +606,10 @@ impl_runtime_apis! {
 		// (weight, RuntimeBlockWeights::get().max_block)
 		   (weight, BlockWeights::get().max_block)
 	   }
-	// try 1: Not working
-	//    fn execute_block_no_check(block: Block) -> frame_support::weights::Weight {
-	// 	   Executive::try_execute_block(block)
-	//    }
+	// // try 1: Not working
+	// 	fn execute_block_no_check(block: Block) -> Weight {
+	// 		Executive::execute_block_no_check(block)
+	// 	}
 
 	// try 2: Working
 		fn execute_block(
