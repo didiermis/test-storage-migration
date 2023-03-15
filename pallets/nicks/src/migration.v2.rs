@@ -26,10 +26,10 @@ const LOG_TARGET: &str = "nicks";
 use frame_support::{log, traits::OnRuntimeUpgrade};
 
 // only contains V1 storage format
-pub mod v1 {
+pub mod v2 {
     use super::*;
 	use frame_support::{pallet_prelude::*, weights::Weight};
-
+	use sp_runtime::Saturating;
     type BalanceOf<T> = <<T as Config>::Currency as Currency<AccountIdOf<T>>>::Balance;
 
     // #[storage_alias]
@@ -44,12 +44,10 @@ pub mod v1 {
 
 	impl<T: Config> OldNickname<T> {
 		fn migrate_to_v2(self) -> Nickname<T> {
-			let third = AccountStatus::Active;
-
 			Nickname {
 				first: self.first,
 				last: self.last,
-				third,
+				third: AccountStatus::default(),
 			}
 		}
 	}
@@ -77,7 +75,7 @@ pub mod v1 {
 	
 				NameOf::<T>::translate::<
 					(OldNickname<T>, BalanceOf<T>), _>(
-					|key: T::AccountId, (name, deposit): (OldNickname<T>, BalanceOf<T>)| {
+					|_key: T::AccountId, (name, deposit): (OldNickname<T>, BalanceOf<T>)| {
 						translated.saturating_inc();
 						Some((name.migrate_to_v2(), deposit))
 					}
@@ -90,7 +88,8 @@ pub mod v1 {
 
 				log::info!(
 					target: LOG_TARGET,
-					"Upgraded {} names, storage to version {:?}",
+					"Upgraded {} names from {} initial names, storage to version {:?}",
+					count,
 					translated,
 					current_version
 				);
