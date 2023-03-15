@@ -43,7 +43,7 @@ pub use pallet::*;
 use sp_runtime::traits::{StaticLookup, Zero};
 use sp_std::prelude::*;
 
-mod migration;
+pub mod migration;
 
 type AccountIdOf<T> = <T as frame_system::Config>::AccountId;
 type BalanceOf<T> = <<T as Config>::Currency as Currency<AccountIdOf<T>>>::Balance;
