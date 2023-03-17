@@ -17,7 +17,7 @@
 
 //! Various pieces of common functionality.
 use super::*;
-use log::info;
+
 // use frame_support::{
 // 	traits::{Get, StorageVersion, GetStorageVersion},
 // 	weights::Weight, storage_alias, Twox64Concat, BoundedVec, log
@@ -31,11 +31,6 @@ pub mod v2 {
 	use frame_support::{pallet_prelude::*, weights::Weight};
 	use sp_runtime::Saturating;
     type BalanceOf<T> = <<T as Config>::Currency as Currency<AccountIdOf<T>>>::Balance;
-
-    // #[storage_alias]
-	// pub(super) type NameOf<T: Config> =
-	// 	StorageMap<Pallet<T>, Twox64Concat, <T as frame_system::Config>::AccountId, (BoundedVec<u8, <T as pallet::Config>::MaxLength>, BalanceOf<T>)>;
-
 	#[derive(Decode)]
 	pub struct OldNickname<T: Config> {
 		pub first: BoundedVec<u8, T::MaxLength>,
@@ -65,8 +60,6 @@ pub mod v2 {
 				onchain_version
 			);
 			
-			// Since current version is 1, we only need to migrate from 1 to 2
-			// maybe replace current_version == 1 by current_version < 2
 			if onchain_version == 1 && current_version == 2 {
 				// migrate to v2
 				// Very inefficient, mostly here for illustration purposes.
@@ -147,8 +140,6 @@ pub mod v2 {
 			Ok(())
 		}
 
-	//on_runtime_upgrade()
 	}
 
-//don't code
 }
