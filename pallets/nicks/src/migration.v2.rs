@@ -25,13 +25,12 @@ use super::*;
 const LOG_TARGET: &str = "nicks";
 use frame_support::{log, traits::OnRuntimeUpgrade};
 
-// only contains V1 storage format
 pub mod v2 {
     use super::*;
 	use frame_support::{pallet_prelude::*, weights::Weight};
 	use sp_runtime::Saturating;
     type BalanceOf<T> = <<T as Config>::Currency as Currency<AccountIdOf<T>>>::Balance;
-	#[derive(Decode)]
+	#[derive(Decode, Encode)]
 	pub struct OldNickname<T: Config> {
 		pub first: BoundedVec<u8, T::MaxLength>,
 		pub last: Option<BoundedVec<u8, T::MaxLength>>,
