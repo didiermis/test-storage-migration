@@ -48,6 +48,7 @@ type BalanceOf<T> = <<T as Config>::Currency as Currency<AccountIdOf<T>>>::Balan
 type NegativeImbalanceOf<T> =
 	<<T as Config>::Currency as Currency<AccountIdOf<T>>>::NegativeImbalance;
 type AccountIdLookupOf<T> = <<T as frame_system::Config>::Lookup as StaticLookup>::Source;
+pub mod migration;
 
 #[frame_support::pallet]
 pub mod pallet {
@@ -113,8 +114,10 @@ pub mod pallet {
 	pub(super) type NameOf<T: Config> =
 		StorageMap<_, Twox64Concat, T::AccountId, (BoundedVec<u8, T::MaxLength>, BalanceOf<T>)>;
 
+	const STORAGE_VERSION: StorageVersion = StorageVersion::new(0);
 	#[pallet::pallet]
 	#[pallet::generate_store(pub(super) trait Store)]
+	#[pallet::storage_version(STORAGE_VERSION)]
 	pub struct Pallet<T>(_);
 
 	#[pallet::call]
