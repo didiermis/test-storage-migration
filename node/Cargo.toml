@@ -18,7 +18,7 @@ name = "node-template"
 
 [dependencies]
 # frame-try-runtime = { git = "https://github.com/paritytech/substrate.git", branch = "polkadot-v0.9.37", optional = true }
-# #try-runtime-cli = { git = "https://github.com/paritytech/substrate.git", branch = "polkadot-v0.9.37", optional = true }
+# try-runtime-cli = { git = "https://github.com/paritytech/substrate.git", branch = "polkadot-v0.9.37", optional = true }
 # frame-executive = { version = "4.0.0-dev", default-features = false, git = "https://github.com/paritytech/substrate.git", branch = "polkadot-v0.9.37" }
 # CLI-specific dependencies
 try-runtime-cli = { version = "0.10.0-dev", optional = true, git = "https://github.com/paritytech/substrate.git", branch = "polkadot-v0.9.37" }
