@@ -72,8 +72,6 @@ pub mod v2 {
 						Some((name.migrate_to_v2(), deposit))
 					}
 				);
-				// option 1
-				//StorageVersion::new(2).put::<Pallet::<T>>();
 
 				// option 2
 				current_version.put::<Pallet<T>>();
@@ -99,6 +97,11 @@ pub mod v2 {
 
 		#[cfg(feature = "try-runtime")]
 		fn pre_upgrade() -> Result<Vec<u8>, &'static str> {
+			log::info!(
+				target: LOG_TARGET,
+				"pre_upgrade: current storage version {:?}",
+				Pallet::<T>::current_storage_version()
+			);
 			let current_version = Pallet::<T>::current_storage_version();
 			let onchain_version = Pallet::<T>::on_chain_storage_version();
 			ensure!(
@@ -110,6 +113,20 @@ pub mod v2 {
 				"migration from version 1 to 2."
 			);
 			let prev_count = NameOf::<T>::iter().count();
+			let names = NameOf::<T>::iter_keys().count() as u32;			
+			let decodable_names = NameOf::<T>::iter_values().count() as u32;
+			log::info!(
+				target: LOG_TARGET,
+				"pre_upgrade: {:?} names, {:?} decodable names, {:?} total",
+				names,
+				decodable_names,
+				prev_count,
+			);
+			ensure!(
+				names == decodable_names,
+				"Not all values are decodable."
+			);
+
 			Ok((prev_count as u32).encode())
 		}
 
