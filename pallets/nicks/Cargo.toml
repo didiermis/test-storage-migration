@@ -20,14 +20,20 @@ frame-system = { version = "4.0.0-dev", default-features = false, git = "https:/
 sp-io = { version = "7.0.0", default-features = false, git = "https://github.com/paritytech/substrate.git", branch = "polkadot-v0.9.37" }
 sp-runtime = { version = "7.0.0", default-features = false, git = "https://github.com/paritytech/substrate.git", branch = "polkadot-v0.9.37" }
 sp-std = { version = "5.0.0", default-features = false, git = "https://github.com/paritytech/substrate.git", branch = "polkadot-v0.9.37" }
+frame-executive = { version = "4.0.0-dev", default-features = false, git = "https://github.com/paritytech/substrate.git", branch = "polkadot-v0.9.37" }
+# try-runtime-cli = { git = "https://github.com/paritytech/substrate.git", branch = "polkadot-v0.9.37", optional = true }
+# frame-try-runtime = { version = "0.10.0-dev", default-features = false, git = "https://github.com/paritytech/substrate.git", optional = true, branch = "polkadot-v0.9.37" }
 
 [dev-dependencies]
 pallet-balances = { version = "4.0.0-dev", default-features = false, git = "https://github.com/paritytech/substrate.git", branch = "polkadot-v0.9.37" }
 sp-core = { version = "7.0.0", default-features = false, git = "https://github.com/paritytech/substrate.git", branch = "polkadot-v0.9.37" }
+
 [features]
 default = ["std"]
 std = [
 	"codec/std",
+	# "frame-try-runtime/std",
+	# "frame-executive/std",
 	"frame-support/std",
 	"frame-system/std",
 	"scale-info/std",
@@ -35,4 +41,9 @@ std = [
 	"sp-runtime/std",
 	"sp-std/std",
 ]
-try-runtime = ["frame-support/try-runtime"]
+try-runtime = [
+	# "frame-executive/try-runtime",
+	# "frame-system/try-runtime",
+	"frame-support/try-runtime",
+	# "frame-try-runtime",
+]

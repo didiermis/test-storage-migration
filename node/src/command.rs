@@ -173,6 +173,7 @@ pub fn run() -> sc_cli::Result<()> {
 			})
 		},
 		#[cfg(feature = "try-runtime")]
+		#[cfg(feature = "try-runtime")]
 		Some(Subcommand::TryRuntime(cmd)) => {
 			use crate::service::ExecutorDispatch;
 			use sc_executor::{sp_wasm_interface::ExtendedHostFunctions, NativeExecutionDispatch};

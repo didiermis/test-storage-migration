@@ -43,6 +43,8 @@ pub use pallet::*;
 use sp_runtime::traits::{StaticLookup, Zero};
 use sp_std::prelude::*;
 
+pub mod migration;
+
 type AccountIdOf<T> = <T as frame_system::Config>::AccountId;
 type BalanceOf<T> = <<T as Config>::Currency as Currency<AccountIdOf<T>>>::Balance;
 type NegativeImbalanceOf<T> =
@@ -103,6 +105,21 @@ pub mod pallet {
 	pub struct Nickname<T: Config> {
 		pub first: BoundedVec<u8, T::MaxLength>,
 		pub last: Option<BoundedVec<u8, T::MaxLength>>,
+		pub third: AccountStatus
+	}
+
+    #[derive(Clone, Encode, Decode, TypeInfo, MaxEncodedLen, PartialEqNoBound, RuntimeDebug)]
+	#[scale_info(skip_type_params(T))]
+	#[codec(mel_bound())]
+	pub enum AccountStatus {
+		Active,
+		Inactive,
+	}
+
+	impl Default for AccountStatus {
+		fn default() -> Self {
+			AccountStatus::Active
+		}
 	}
 
 	/// Error for the nicks pallet.
@@ -121,8 +138,8 @@ pub mod pallet {
 	pub(super) type NameOf<T: Config> =
 		StorageMap<_, Twox64Concat, T::AccountId, (Nickname<T>, BalanceOf<T>)>;
 
-	// The current storage version.
-	const STORAGE_VERSION: StorageVersion = StorageVersion::new(1);
+	/// The current storage version.
+	const STORAGE_VERSION: StorageVersion = StorageVersion::new(2);
 
 	#[pallet::pallet]
 	#[pallet::generate_store(pub(super) trait Store)]
@@ -182,7 +199,7 @@ pub mod pallet {
 				deposit
 			};
 
-			<NameOf<T>>::insert(&sender, (Nickname{first: bounded_first, last: bounded_last}, deposit));
+			<NameOf<T>>::insert(&sender, (Nickname{first: bounded_first, last: bounded_last, third: AccountStatus::default()}, deposit));
 			Ok(())
 		}
 
@@ -275,7 +292,7 @@ pub mod pallet {
 			let target = T::Lookup::lookup(target)?;
 			let deposit = <NameOf<T>>::get(&target).map(|x| x.1).unwrap_or_else(Zero::zero);
 
-			<NameOf<T>>::insert(&target, (Nickname{first: bounded_first, last: bounded_last}, deposit));
+			<NameOf<T>>::insert(&target, (Nickname{first: bounded_first, last: bounded_last, third: AccountStatus::default()}, deposit));
 
 			Self::deposit_event(Event::<T>::NameForced { target });
 			Ok(())

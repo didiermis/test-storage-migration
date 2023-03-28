@@ -105,7 +105,7 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
 	//   `spec_version`, and `authoring_version` are the same between Wasm and native.
 	// This value is set to 100 to notify Polkadot-JS App (https://polkadot.js.org/apps) to use
 	//   the compatible custom types.
-	spec_version: 101,
+	spec_version: 100,
 	impl_version: 1,
 	apis: RUNTIME_API_VERSIONS,
 	transaction_version: 1,
@@ -344,6 +344,15 @@ pub type UncheckedExtrinsic =
 	generic::UncheckedExtrinsic<Address, RuntimeCall, Signature, SignedExtra>;
 /// The payload being signed in transactions.
 pub type SignedPayload = generic::SignedPayload<RuntimeCall, SignedExtra>;
+
+/// All migrations that will run on the next runtime upgrade.
+///
+/// Should be cleared after every release.
+pub type Migrations = (
+	// pallet_nicks::migration::v1::MigrateToV1<Runtime>,
+	// pallet_nicks::migration::v2::MigrateToV2<Runtime>,
+);
+
 /// Executive: handles dispatch to the various modules.
 pub type Executive = frame_executive::Executive<
 	Runtime,
@@ -351,6 +360,7 @@ pub type Executive = frame_executive::Executive<
 	frame_system::ChainContext<Runtime>,
 	Runtime,
 	AllPalletsWithSystem,
+	Migrations,
 >;
 
 #[cfg(feature = "runtime-benchmarks")]
@@ -557,15 +567,21 @@ impl_runtime_apis! {
 		}
 	}
 
+	// First implementation of try-runtime
 	#[cfg(feature = "try-runtime")]
 	impl frame_try_runtime::TryRuntime<Block> for Runtime {
-		fn on_runtime_upgrade(checks: frame_try_runtime::UpgradeCheckSelect) -> (Weight, Weight) {
-			// NOTE: intentional unwrap: we don't want to propagate the error backwards, and want to
-			// have a backtrace here. If any of the pre/post migration checks fail, we shall stop
-			// right here and right now.
-			let weight = Executive::try_runtime_upgrade(checks).unwrap();
-			(weight, BlockWeights::get().max_block)
-		}
+	   fn on_runtime_upgrade(checks: frame_try_runtime::UpgradeCheckSelect) -> (Weight, Weight) {
+		   log::info!("try-runtime::on_runtime_upgrade.");
+		   // NOTE: intentional unwrap: we don't want to propagate the error backwards, and want to
+		   // have a backtrace here. If any of the pre/post migration checks fail, we shall stop
+		   // right here and right now.
+		   //  let weight = Executive::try_runtime_upgrade(checks).unwrap();
+		   let weight = Executive::try_runtime_upgrade(checks).map_err(|err|{
+			   log::info!("try-runtime::on_runtime_upgrade failed with: {:?}", err);
+			   err
+		   }).unwrap();
+		   (weight, BlockWeights::get().max_block)
+	   }
 
 		fn execute_block(
 			block: Block,

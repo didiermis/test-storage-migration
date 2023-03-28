@@ -16,6 +16,9 @@ targets = ["x86_64-unknown-linux-gnu"]
 codec = { package = "parity-scale-codec", version = "3.0.0", default-features = false, features = ["derive"] }
 scale-info = { version = "2.1.1", default-features = false, features = ["derive"] }
 
+#try-runtime-cli = { git = "https://github.com/paritytech/substrate.git", branch = "polkadot-v0.9.37", optional = true }
+log = "0.4.17"
+
 pallet-aura = { version = "4.0.0-dev", default-features = false, git = "https://github.com/paritytech/substrate.git", branch = "polkadot-v0.9.37" }
 pallet-balances = { version = "4.0.0-dev", default-features = false, git = "https://github.com/paritytech/substrate.git", branch = "polkadot-v0.9.37" }
 frame-support = { version = "4.0.0-dev", default-features = false, git = "https://github.com/paritytech/substrate.git", branch = "polkadot-v0.9.37" }
@@ -56,6 +59,7 @@ substrate-wasm-builder = { version = "5.0.0-dev", git = "https://github.com/pari
 
 [features]
 default = ["std"]
+# with-tracing = ["frame-executive/with-tracing"]
 std = [
 	"frame-try-runtime?/std",
 	"frame-system-benchmarking?/std",
@@ -108,6 +112,7 @@ try-runtime = [
 	"frame-support/try-runtime",
 	"pallet-aura/try-runtime",
 	"pallet-balances/try-runtime",
+	"pallet-nicks/try-runtime",
 	"pallet-grandpa/try-runtime",
 	"pallet-randomness-collective-flip/try-runtime",
 	"pallet-sudo/try-runtime",
